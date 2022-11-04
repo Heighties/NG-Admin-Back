@@ -2,10 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-const stuffRoutes = require('./routes/stuff');
-const userRoutes = require('./routes/user');
+const showreelRoutes = require('./routes/showreel');
+const realisationRoutes = require('./routes/realisation');
 
-mongoose.connect('mongodb+srv://Heighties:Familleusa64@cluster0.inhyn38.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect("mongodb+srv://ngproject:gj3pFs6W9tPietJB@cluster0.7zrowa0.mongodb.net/?retryWrites=true&w=majority",
 { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-app.use('/api/stuff', stuffRoutes);
-app.use('/api/auth', userRoutes);
+app.use('/api/showreel', showreelRoutes);
+app.use('/api/realisation', realisationRoutes);
 
 module.exports = app;
