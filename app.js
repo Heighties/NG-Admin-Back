@@ -4,8 +4,19 @@ const mongoose = require('mongoose');
 
 const showreelRoutes = require('./routes/showreel');
 const realisationRoutes = require('./routes/realisation');
+const userRoutes = require('./routes/user')
 
-mongoose.connect("mongodb+srv://ngproject:gj3pFs6W9tPietJB@cluster0.7zrowa0.mongodb.net/?retryWrites=true&w=majority",
+const helmet = require('helmet');
+const nocache = require('nocache');
+
+const dotenv = require('dotenv');
+const rateLimit = require('express-rate-limit')
+
+
+dotenv.config();
+
+
+mongoose.connect("mongodb+srv://ngproject:IQUXml2sC9jUB5Ga@cluster0.7zrowa0.mongodb.net/?retryWrites=true&w=majority",
 { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -14,6 +25,13 @@ mongoose.connect("mongodb+srv://ngproject:gj3pFs6W9tPietJB@cluster0.7zrowa0.mong
 const app = express();
 
 // app.use(express.json());
+
+const limiter = rateLimit({
+	windowMs: 1 * 60 * 1000, // 15 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,7 +42,17 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+app.use(limiter)
+
+app.use(nocache());
+
 app.use('/api/showreel', showreelRoutes);
 app.use('/api/realisation', realisationRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
