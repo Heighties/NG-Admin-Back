@@ -2,13 +2,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+
 const showreelRoutes = require('./routes/showreel');
 const realisationRoutes = require('./routes/realisation');
-const userRoutes = require('./routes/user')
+const productRoutes = require('./routes/products');
+const userRoutes = require('./routes/user');
+
 
 const helmet = require('helmet');
 const nocache = require('nocache');
-
+const cors = require('cors');
 const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit')
 
@@ -50,9 +53,12 @@ app.use(
 app.use(limiter)
 
 app.use(nocache());
+app.use(cors());
 
 app.use('/api/showreel', showreelRoutes);
 app.use('/api/realisation', realisationRoutes);
+app.use('/api/products', productRoutes);
 app.use('/api/auth', userRoutes);
+
 
 module.exports = app;
