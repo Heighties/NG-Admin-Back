@@ -1,29 +1,102 @@
 // in controllers/stuff.js
 
 const Realisation = require('../models/Realisation');
+const fs = require('fs')
 
 
 exports.createRealisation = (req, res, next) => {
     delete req.body._id;
     const realisation = new Realisation({
-      ...req.body
+      ...req.body,
+      picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
     realisation.save()
       .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
       .catch(error => res.status(400).json({ error }));
 };
 
+// exports.modifyRealisation = (req, res, next) => {
+//     Realisation.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+//       .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+//       .catch(error => res.status(400).json({ error }));
+// };
+
+
 exports.modifyRealisation = (req, res, next) => {
-    Realisation.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-      .catch(error => res.status(400).json({ error }));
-};
+  let realisationObject = {};
+  req.file ? (
+    // Si la modification contient une image => Utilisation de l'opérateur ternaire comme structure conditionnelle.
+    Realisation.findOne({
+      _id: req.params.id
+    }).then((realisation) => {
+      // Supperssion de l'ancienne image du serveur
+      const filename = realisation.picture.split('/images/')[1]
+      fs.unlinkSync(`images/${filename}`)
+    }),
+    realisationObject = {
+      // Modification des données et ajout de la nouvelle image
+      ...JSON.parse(req.body.realisation),
+      picture: `${req.protocol}://${req.get('host')}/images/${
+        req.file.filename
+      }`,
+    }
+  ) : ( 
+    realisationObject = {
+      ...req.body
+    }
+  )
+
+  
+  Realisation.updateOne(
+      // Application des paramètre de realisationObject
+      {
+        _id: req.params.id
+      }, {
+        ...realisationObject,
+        _id: req.params.id
+      }
+    )
+    .then(() => res.status(200).json({
+      message: 'Realisation modifiée !'
+    }))
+    .catch((error) => res.status(400).json({
+      error
+    }))
+}
 
 exports.deleteRealisation = (req, res, next) => {
-    Realisation.deleteOne({ _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-      .catch(error => res.status(400).json({ error }));
+  // Recherche de l'URL de l'image afin de supprimer le fichier avant suppression de l'objet
+  Realisation.findOne({
+      _id: req.params.id
+    })
+    .then(realisation => {
+      // Pour extraire ce fichier, on récupère l'url de la realisation, et on le split autour de la chaine de caractères, donc le nom du fichier
+      const filename = realisation.picture.split('/images/')[1];
+      // Avec ce nom de fichier, on appelle unlink pour suppr le fichier
+      fs.unlink(`images/${filename}`, () => {
+        // Suppression du document correspondant de la base de données
+        Realisation.deleteOne({
+            _id: req.params.id
+          })
+          .then(() => res.status(200).json({
+            message: 'Realisation supprimée !'
+          }))
+          .catch(error => res.status(400).json({
+            error
+          }));
+      });
+    })
+    .catch(error => res.status(500).json({
+      error
+    }));
 };
+
+
+// exports.deleteRealisation = (req, res, next) => {
+//     Realisation.deleteOne({ _id: req.params.id })
+//       .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+//       .catch(error => res.status(400).json({ error }));
+// };
 
 exports.getOneRealisation =(req, res, next) => {
     Realisation.findOne({ _id: req.params.id })

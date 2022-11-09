@@ -4,10 +4,10 @@ const router = express.Router();
 
 const realisationCtrl = require('../controllers/realisation');
 
-router.post('/', realisationCtrl.createRealisation);
-router.put('/:id', realisationCtrl.modifyRealisation);
-router.delete('/:id', realisationCtrl.deleteRealisation);
-router.get('/:id', realisationCtrl.getOneRealisation);
-router.get('/', realisationCtrl.getAllRealisations);
+router.post('/', multer, realisationCtrl.createRealisation);
+router.put('/:id', multer, realisationCtrl.modifyRealisation);
+router.delete('/:id', multer, realisationCtrl.deleteRealisation);
+router.get('/:id', multer, realisationCtrl.getOneRealisation);
+router.get('/', multer, realisationCtrl.getAllRealisations);
 
 module.exports = router;
