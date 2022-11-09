@@ -7,14 +7,17 @@ const showreelRoutes = require('./routes/showreel');
 const realisationRoutes = require('./routes/realisation');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/user');
+const path = require('path');
 
 
 const helmet = require('helmet');
 const nocache = require('nocache');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const rateLimit = require('express-rate-limit')
-
+const rateLimit = require('express-rate-limit');
+const fs  = require('fs');
+const multer = require('multer');
+// const upload = multer({dest: "./images/"})
 
 dotenv.config();
 
@@ -59,6 +62,7 @@ app.use('/api/showreel', showreelRoutes);
 app.use('/api/realisation', realisationRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
 module.exports = app;

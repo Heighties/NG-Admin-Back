@@ -5,10 +5,13 @@ const fs = require('fs')
 
 
 exports.createRealisation = (req, res, next) => {
-    delete req.body._id;
+  const realisationObject = JSON.parse(req.body.realisation);
+    delete realisationObject._id;
+    delete realisationObject._userId;
     const realisation = new Realisation({
-      ...req.body,
-      picture: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+      ...realisationObject,
+      userId: req.auth.userId,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
     realisation.save()
       .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
