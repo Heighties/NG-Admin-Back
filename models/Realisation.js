@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const sanitizerPlugin = require('mongoose-sanitizer-plugin');
+// const sanitizerPlugin = require('mongoose-sanitizer-plugin');
 
 const realisationSchema = mongoose.Schema({
     name: { type: String, required: true},
@@ -8,6 +8,6 @@ const realisationSchema = mongoose.Schema({
     picture: {type: String, required: true },
 });
 
-realisationSchema.plugin(sanitizerPlugin);
+// realisationSchema.plugin(sanitizerPlugin);
 
 module.exports = mongoose.model('Realisation', realisationSchema);

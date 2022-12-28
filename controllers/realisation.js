@@ -5,17 +5,17 @@ const fs = require('fs')
 
 
 exports.createRealisation = (req, res, next) => {
-  const realisationObject = JSON.parse(req.body.realisation);
+  const realisationObject = req.body;
     delete realisationObject._id;
     delete realisationObject._userId;
     const realisation = new Realisation({
       ...realisationObject,
-      userId: req.auth.userId,
+      userId: req.user._id,
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
     realisation.save()
-      .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-      .catch(error => res.status(400).json({ error }));
+  .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
+  .catch(error => res.status(400).json({ message: 'Erreur lors de l\'enregistrement de l\'objet', details: error }));
 };
 
 // exports.modifyRealisation = (req, res, next) => {
@@ -27,7 +27,7 @@ exports.createRealisation = (req, res, next) => {
 
 exports.modifyRealisation = (req, res, next) => {
   let realisationObject = {};
-  req.file ? (
+  if (req.file) {
     // Si la modification contient une image => Utilisation de l'opérateur ternaire comme structure conditionnelle.
     Realisation.findOne({
       _id: req.params.id
@@ -35,7 +35,7 @@ exports.modifyRealisation = (req, res, next) => {
       // Supperssion de l'ancienne image du serveur
       const filename = realisation.picture.split('/images/')[1]
       fs.unlinkSync(`images/${filename}`)
-    }),
+    })
     realisationObject = {
       // Modification des données et ajout de la nouvelle image
       ...JSON.parse(req.body.realisation),
@@ -43,13 +43,12 @@ exports.modifyRealisation = (req, res, next) => {
         req.file.filename
       }`,
     }
-  ) : ( 
+  } else {
     realisationObject = {
       ...req.body
     }
-  )
+  }
 
-  
   Realisation.updateOne(
       // Application des paramètre de realisationObject
       {
