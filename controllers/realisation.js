@@ -13,9 +13,13 @@ exports.createRealisation = (req, res, next) => {
       userId: req.user._id,
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-    realisation.save()
+    console.log("Realisation créée :", realisation); // Ajout d'un message de log
+  realisation.save()
   .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-  .catch(error => res.status(400).json({ message: 'Erreur lors de l\'enregistrement de l\'objet', details: error }));
+  .catch(error => {
+    console.error("Erreur lors de l'enregistrement de l'objet :", error); // Ajout d'un message de log
+    res.status(400).json({ message: 'Erreur lors de l\'enregistrement de l\'objet', details: error });
+  });
 };
 
 // exports.modifyRealisation = (req, res, next) => {
