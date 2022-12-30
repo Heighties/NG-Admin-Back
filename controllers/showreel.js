@@ -1,5 +1,3 @@
-// in controllers/stuff.js
-
 const Showreel = require('../models/Showreel');
 
 

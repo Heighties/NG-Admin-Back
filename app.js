@@ -121,6 +121,8 @@ app.use(limiter)
 app.use(nocache());
 app.use(cors());
 
+app.use(express.urlencoded({ extended: true }));
+
 app.use('/api/showreel', showreelRoutes);
 app.use('/api/realisation', realisationRoutes);
 app.use('/api/products', productRoutes);

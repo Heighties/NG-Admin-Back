@@ -1,25 +1,35 @@
-// in controllers/stuff.js
-
 const Realisation = require('../models/Realisation');
 const fs = require('fs')
 
 
 exports.createRealisation = (req, res, next) => {
+  console.log("Données de la réalisation reçues :", req.body); // Affiche les données de la réalisation reçues dans la requête HTTP
   const realisationObject = req.body;
+  if ('_id' in realisationObject) {
     delete realisationObject._id;
-    delete realisationObject._userId;
-    const realisation = new Realisation({
-      ...realisationObject,
-      userId: req.user._id,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    });
-    console.log("Realisation créée :", realisation); // Ajout d'un message de log
-  realisation.save()
-  .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-  .catch(error => {
-    console.error("Erreur lors de l'enregistrement de l'objet :", error); // Ajout d'un message de log
-    res.status(400).json({ message: 'Erreur lors de l\'enregistrement de l\'objet', details: error });
+  }
+  if('_userId' in realisationObject){
+  delete realisationObject._userId;
+  }
+  
+  if (!req.file) {
+    return res.status(400).json({error: 'No image provided'});
+  }
+  const realisation = new Realisation({
+    ...realisationObject,
+    userId: req.user._id,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   });
+  console.log("Realisation créée :", realisation); // Affiche l'objet réalisation créé
+  realisation.save()
+    .then(() => {
+      console.log("Realisation enregistrée en base de données"); // Affiche un message de réussite lors de l'enregistrement
+      res.status(201).json({ message: 'Objet enregistré !'});
+    })
+    .catch(error => {
+      console.error("Erreur lors de l'enregistrement de l'objet :", error); // Affiche une erreur potentielle lors de l'enregistrement
+      res.status(400).json({ message: 'Erreur lors de l\'enregistrement de l\'objet', details: error });
+    });
 };
 
 // exports.modifyRealisation = (req, res, next) => {

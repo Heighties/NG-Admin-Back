@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 const realisationCtrl = require('../controllers/realisation');
 const Image = require('../models/Image');
 
-router.post('/', auth, multer, (req, res) => {
+router.post('/realisation/images', auth, multer, (req, res) => {
 // Récupère l'image envoyée dans la requête
 const image = req.file;
 // Vérifie si l'image a bien été envoyée
